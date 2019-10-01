@@ -35,6 +35,32 @@ router.post('/edit/:id', function(req, res, next) {
 	res.send('edit specific member by id');
 });
 
+router.post('/add', async function(req, res, next) {
+	const memberData = {
+		owner: req.body.owner,
+		company: req.body.company,
+		phone: req.body.phone,
+		email: req.body.email,
+		digitalCard: req.body.digitalCard,
+	}
+	console.log('Member Data', memberData)
+	try {
+		const memberId = await db('members').insert(memberData);	
+		return res.status(200).json({
+						code: 200,
+						msg: "Member created",
+						data: memberData						
+					});	
+	} catch (error) {
+		console.error(error)
+		return res.status(500).json({
+			code: 199,
+			msg: "error"						
+		});	
+	}
+	
+});
+
 router.post('/delete/:id', function(req, res, next) {
 	res.send('delete specific member by id');
 });

@@ -18,17 +18,23 @@ router.post('/logout', function(req, res, next) {
 router.post('/register', async function(req, res, next) {
 	const hashedPassword = bcrypt.hashSync(req.body.password, 8);
 	const email = req.body.email;
-	console.log('Params', email)
+	console.log('Params', email);
+	
+	const token = await jwt.sign({ id: email }, config.secret, {
+       expiresIn: 86400 // expires in 24 hours
+	});
+	const userData = {
+		email: email,
+		password: hashedPassword,
+		token: token
+	}
 	const userId = await db('user')
-					.insert({'email': email, password: hashedPassword});					
-	await console.log('User created', userId);
-	const token = await jwt.sign({ id: userId }, config.secret, {
-      expiresIn: 86400 // expires in 24 hours
-    });
-	return await res.json({
+					.insert(userData);					
+	console.log('User created', userId);
+	return res.json({
 		code: 200,
 		msg: "User created",
-		data:token
+		data: token
 	});
 });
 
