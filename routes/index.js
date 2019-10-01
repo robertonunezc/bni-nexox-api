@@ -5,10 +5,39 @@ var bcrypt = require('bcryptjs');
 const db = require('../db');
 const config = require('../config');
 
-router.post('/login', function(req, res, next) {
+router.post('/login', async function(req, res, next) {
 	const email = req.body.email;
-	const password = req.body.password;
-	const login = db.select().from(user).where({'email': email, 'password': password});	
+	try {
+		const user = await db.select('token','password').from('user').where('email', email);
+		console.log('Login Response', user);
+		if(user.length == 0) {
+			return res.json({
+				code: 199,
+				msg: "Login Wrong",
+				data: null
+			});
+		}
+		const hashedPassword = bcrypt.compareSync(req.body.password,user[0].password);
+
+		if(!hashedPassword){
+			return res.json({
+				code: 199,
+				msg: "Login Wrong",
+				data: null
+			});
+		}	
+		return res.json({
+			code: 200,
+			msg: "Login OK",
+			data: user[0].token
+		});		
+	} catch (error) {
+		console.error(error)
+		return res.status(500).json({
+			code: 500,
+			msg: "error accediendo a la BD"						
+		});	
+	}
 });
 
 router.post('/logout', function(req, res, next) {
