@@ -46,8 +46,12 @@ router.post('/add',upload.single('file'), async function(req, res, next) {
 		email: req.body.email,
 		digitalCard: req.body.digitalCardName,
 	}
-	
-	await saveFile(req);
+	try {
+		saveFile(req);
+		
+	} catch (error) {
+		console.log('Error saving file', error)		
+	}
 
 	console.log('Member Data')
 	try {
