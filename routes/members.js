@@ -72,8 +72,25 @@ router.post('/add',upload.single('file'), async function(req, res, next) {
 	
 });
 
-router.post('/delete/:id', function(req, res, next) {
-	res.send('delete specific member by id');
+router.get('/delete/:id', async function(req, res, next) {
+	const memberId = req.params.id;
+	try {
+		await db('members').where('id', memberId).del();	
+		const members = await db.select().from('members');
+	
+		return res.json({
+			code: 200,
+			msg: "Member Deleted",		
+			data: members	
+		});
+	} catch(e) {
+		// statements
+		console.log('Error deleting member', e);
+		return res.json({
+			code: 199,
+			msg: "Error deleting member"			
+		});
+	}	
 });
 
 async function saveFile(req){
