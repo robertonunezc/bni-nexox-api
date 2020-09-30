@@ -9,7 +9,8 @@ const userMiddlewares = require('../middlewares/users');
 /* GET users listing. */
 router.get('/', middlewares.validJWTNeeded, async function (req, res, next) {
 	const ownerUser = await userMiddlewares.getOwnerUser(req.headers['authorization']);
-	const members = await db.select().from('members').where('ownerUser', ownerUser);
+	console.log(ownerUser[0].id);
+	const members = await db.select().from('members').where('ownerUser', ownerUser[0].id);
 	return res.json({
 		code: 200,
 		msg: "All members",
